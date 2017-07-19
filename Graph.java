@@ -8,9 +8,12 @@ import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 
 public class Graph {
-    public static void AStar(Board board) {
+    public static ArrayList<int[]> AStar(Board board) {
         //Given a board object, finds the shortest path between the source and goal using AStar
         //Colours the visited squares white, and the path red
+
+        //Record nodes in the order they're visited
+        ArrayList<int[]> visitedNodes = new ArrayList<int[]>();
 
         //Start by finding the source and goal locations
         int[] goalLoc = board.getGoal();
@@ -48,34 +51,20 @@ public class Graph {
                     pq.add(n);
                     inpq.add(n.toString());
                     visited.add(n.toString());
-                    board.visitSquare(n.getX(), n.getY());
-                    Runner.refresh();
+                    int[] nodeInt = new int[2];
+                    nodeInt[0] = n.getX();
+                    nodeInt[1] = n.getY();
+                    visitedNodes.add(nodeInt);
+                    // board.visitSquare(n.getX(), n.getY());
+                    // Runner.refresh();
                     parent.put(n, curNode);
                 }
             }
         }
 
         //Now, calculate final path
+        return visitedNodes;
     }
-
-    // //Given a board object, find all the nodes and return them
-    // private static Set<Node> getAllNodes(Board board, Node goal) {
-    //     //Create empty set of nodes
-    //     Set<Node> nodes = new HashSet<Node>();
-    //     //Retrieve game board
-    //     int[][] gameBoard = board.getGameBoard();
-    //     //Loop over it
-    //     for(int i=0; i<gameBoard.length; i++) {
-    //         for(int j=0; j<gameBoard[0].length; j++) {
-    //             //If the square is empty, it's a node
-    //             if(gameBoard[i][j] == 0) {
-    //                 Node curNode = new Node(j, i, 10000, euclidianDist(j, i, goal));
-    //                 nodes.add(curNode);
-    //             }
-    //         }
-    //     }
-    //     return nodes;
-    // }
 
     //Given a goal node, and a source node's coordinates, find the euclidian distance between them
     private static double euclidianDist(int x, int y, Node goal) {

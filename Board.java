@@ -49,6 +49,11 @@ public class Board extends JPanel implements ActionListener {
     private int goalX;
     private int goalY;
 
+    //Keep track of whether pathfinding has taken place or not, and the visited nodes (if it has)
+    private boolean pathComplete = false;
+    private ArrayList<int[]> visited;
+    private int curNode = 0;
+
     public Board() {
         //Set right click listener, black background, focusable property and preferred size
         this.addMouseListener(new RightClickListener());
@@ -73,9 +78,28 @@ public class Board extends JPanel implements ActionListener {
 
         //Set mouse motion listener (for painting walls)
         this.addMouseMotionListener(new WallPaintListener());
+
+        //Set timer (for updating display in real-time when painting nodes visited during search)
+        int delay = 7;
+        ActionListener visitedNodePainter = new ActionListener() {
+            public void actionPerformed(ActionEvent evt) {
+                Runner.paintNextVisitedNode();
+                Runner.refresh();
+            }
+        };
+        new Timer(delay, visitedNodePainter).start();
     }
 
-    //Returns the source location as
+    //Paints the next visited node (if appropriate)
+    public void paintNextVisitedNode() {
+        if(pathComplete && curNode != visited.size()-1) {
+            int[] nextNode = this.visited.get(curNode++);
+            this.visitSquare(nextNode[0], nextNode[1]);
+            Runner.refresh();
+        }
+    }
+
+    //Returns the source location as an array of 2 ints
     public int[] getSource() {
         int[] sourceLoc = new int[2];
         sourceLoc[0] = this.sourceX;
@@ -83,7 +107,7 @@ public class Board extends JPanel implements ActionListener {
         return sourceLoc;
     }
 
-    //Returns the source location as
+    //Returns the goal location as an array of 2 ints
     public int[] getGoal() {
         int[] goalLoc = new int[2];
         goalLoc[0] = this.goalX;
@@ -202,6 +226,36 @@ public class Board extends JPanel implements ActionListener {
     public void visitSquare(int x, int y) {
         this.gameBoard[y][x] = VISITED;
     }
+
+    //Record visited nodes, so that they can be displayed
+    public void recordVisitedNodes(ArrayList<int[]> visitedNodes) {
+        this.visited = visitedNodes;
+        this.pathComplete = true;
+    }
+
+    //Resets board (so that pathfinding can be done again)
+    public void resetBoard() {
+        //Reset info about visited nodes
+        this.visited = null;
+        this.pathComplete = false;
+        this.curNode = 0;
+
+        /*Reset board data*/
+        //Initialize the game board to all empty blocks
+        for(int i=0; i<this.gameBoard.length; i++) {
+            for(int j=0; j<this.gameBoard[i].length; j++) {
+                this.gameBoard[i][j] = EMPTY;
+            }
+        }
+
+        //Place source and goal
+        this.sourceX = 4;
+        this.sourceY = 3;
+        this.goalX = (B_WIDTH/DOT_SIZE)-3;
+        this.goalY = (B_HEIGHT/DOT_SIZE)-4;
+        gameBoard[this.sourceY][this.sourceX] = SOURCE;
+        gameBoard[this.goalY][this.goalX] = GOAL;
+    }
 }
 
 class RightClickMenu extends JPopupMenu {
@@ -212,6 +266,7 @@ class RightClickMenu extends JPopupMenu {
     private JMenuItem startWallErasing;
     private JMenuItem moveSource;
     private JMenuItem moveGoal;
+    private JMenuItem resetBoard;
 
     //Create and add all menu items
     public RightClickMenu() {
@@ -240,6 +295,11 @@ class RightClickMenu extends JPopupMenu {
         this.moveGoal = new JMenuItem("Move Goal");
         this.moveGoal.addActionListener(new MenuItemListener());
         this.add(moveGoal);
+
+        //Sixth menu item allows user to reset the board
+        this.resetBoard = new JMenuItem("Reset");
+        this.resetBoard.addActionListener(new MenuItemListener());
+        this.add(resetBoard);
     }
 }
 
@@ -268,6 +328,9 @@ class MenuItemListener extends AbstractAction {
         //User wants to move the goal
         else if(text.equals("Move Goal")) {
             Runner.setGoalPlaceMode();
+        }
+        else if(text.equals("Reset")) {
+            Runner.resetBoard();
         }
     }
 }
