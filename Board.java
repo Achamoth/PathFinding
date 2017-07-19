@@ -16,6 +16,8 @@ import javax.swing.JPanel;
 import javax.swing.Timer;
 import javax.swing.*;
 
+import java.util.ArrayList;
+
 public class Board extends JPanel implements ActionListener {
 
     //The dimensions of the simulation
@@ -89,6 +91,10 @@ public class Board extends JPanel implements ActionListener {
         return goalLoc;
     }
 
+    public int[][] getGameBoard() {
+        return this.gameBoard;
+    }
+
     @Override
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
@@ -146,6 +152,16 @@ public class Board extends JPanel implements ActionListener {
         return ( (x/DOT_SIZE>=0) && (x/DOT_SIZE<(B_WIDTH/DOT_SIZE)) && (y/DOT_SIZE>=0) && (y/DOT_SIZE<(B_HEIGHT/DOT_SIZE)) );
     }
 
+    //Given an x,y coordinate pair, check to see if it's an empty square on the board
+    public boolean isEmptySquareOrGoal(int x, int y) {
+        if(x<gameBoard[0].length && x>=0 && y<gameBoard.length && y>=0) {
+            if(gameBoard[y][x] == EMPTY || gameBoard[y][x] == GOAL) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     //Given an x-coordinate and y-coordinate for a mouse event, set a wall there
     public void setWall(int x, int y) {
         if(this.valid(x, y)) {
@@ -180,6 +196,11 @@ public class Board extends JPanel implements ActionListener {
             this.goalX = x/DOT_SIZE;
             this.gameBoard[this.goalY][this.goalX] = GOAL;
         }
+    }
+
+    //Given an x,y coordinate pair, make that square visited
+    public void visitSquare(int x, int y) {
+        this.gameBoard[y][x] = VISITED;
     }
 }
 
