@@ -82,13 +82,14 @@ public class Runner {
 
     //Use pathfinding algorithm to find path from source to goal, and paint display in real-time to visualize algorithm
     public static void findPath() {
-        ArrayList<int[]> visited = Graph.AStar(board);
-        board.recordVisitedNodes(visited);
+        ArrayList<int[]> visited = new ArrayList<int[]>();
+        ArrayList<int[]> path = Graph.AStar(board, visited);
+        board.recordVisitedNodesAndPath(visited, path);
     }
 
     //Paint the next visited node (in the array list) onto the board
-    public static void paintNextVisitedNode() {
-        board.paintNextVisitedNode();
+    public static void paintNextNode() {
+        board.paintNextNode();
     }
 
     //Reset board (to perform pathfinding again)

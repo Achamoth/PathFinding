@@ -3,17 +3,16 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.HashMap;
 import java.lang.Double;
+import java.lang.Integer;
 import java.util.PriorityQueue;
 import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 
 public class Graph {
-    public static ArrayList<int[]> AStar(Board board) {
+    //Find a path from source to goal using A*, and also record visited nodes (in order) in visitedNodes
+    public static ArrayList<int[]> AStar(Board board, ArrayList<int[]> visitedNodes) {
         //Given a board object, finds the shortest path between the source and goal using AStar
         //Colours the visited squares white, and the path red
-
-        //Record nodes in the order they're visited
-        ArrayList<int[]> visitedNodes = new ArrayList<int[]>();
 
         //Start by finding the source and goal locations
         int[] goalLoc = board.getGoal();
@@ -21,16 +20,13 @@ public class Graph {
         int[] sourceLoc = board.getSource();
         Node source = new Node(sourceLoc[0], sourceLoc[1],euclidianDist(sourceLoc[0], sourceLoc[1], goal) ,0);
 
-        // //Now get all nodes from graph
-        // Set<Node> nodes = getAllNodes(board, goal);
-
         //Set up hashset of visited nodes
         Set<String> visited = new HashSet<String>();
         visited.add(source.toString());
 
         //Set up hashmap of parent nodes and distances
-        Map<Node, Node> parent = new HashMap<Node, Node>();
-        parent.put(source, null);
+        Map<String, String> parent = new HashMap<String, String>();
+        parent.put(source.toString(), null);
 
         //Set up priority queue of nodes
         PriorityQueue<Node> pq = new PriorityQueue<Node>();
@@ -55,15 +51,33 @@ public class Graph {
                     nodeInt[0] = n.getX();
                     nodeInt[1] = n.getY();
                     visitedNodes.add(nodeInt);
-                    // board.visitSquare(n.getX(), n.getY());
-                    // Runner.refresh();
-                    parent.put(n, curNode);
+                    parent.put(n.toString(), curNode.toString());
                 }
             }
         }
 
         //Now, calculate final path
-        return visitedNodes;
+        ArrayList<String> pathInverted = new ArrayList<String>();
+        String curNode = parent.get(goal.toString());
+        while(curNode != null) {
+            pathInverted.add(curNode);
+            curNode = parent.get(curNode);
+        }
+        ArrayList<int[]> path = new ArrayList<int[]>();
+        for(int i=pathInverted.size()-1; i>=0; i--) {
+            path.add(stringToCoordinates(pathInverted.get(i)));
+        }
+        
+        return path;
+    }
+
+    //Given coordinates as a string (x,y format), output the coordinates as an array of 2 ints
+    private static int[] stringToCoordinates(String coordinates) {
+        int[] output = new int[2];
+        String tokens[] = coordinates.split(",");
+        output[0] = Integer.parseInt(tokens[0]);
+        output[1] = Integer.parseInt(tokens[1]);
+        return output;
     }
 
     //Given a goal node, and a source node's coordinates, find the euclidian distance between them

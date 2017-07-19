@@ -52,7 +52,9 @@ public class Board extends JPanel implements ActionListener {
     //Keep track of whether pathfinding has taken place or not, and the visited nodes (if it has)
     private boolean pathComplete = false;
     private ArrayList<int[]> visited;
-    private int curNode = 0;
+    private ArrayList<int[]> path;
+    private int curVisitedNode = 0;
+    private int curPathNode = 0;
 
     public Board() {
         //Set right click listener, black background, focusable property and preferred size
@@ -81,21 +83,36 @@ public class Board extends JPanel implements ActionListener {
 
         //Set timer (for updating display in real-time when painting nodes visited during search)
         int delay = 7;
-        ActionListener visitedNodePainter = new ActionListener() {
+        ActionListener nodePainter = new ActionListener() {
             public void actionPerformed(ActionEvent evt) {
-                Runner.paintNextVisitedNode();
+                Runner.paintNextNode();
                 Runner.refresh();
             }
         };
-        new Timer(delay, visitedNodePainter).start();
+        new Timer(delay, nodePainter).start();
     }
 
-    //Paints the next visited node (if appropriate)
-    public void paintNextVisitedNode() {
-        if(pathComplete && curNode != visited.size()-1) {
-            int[] nextNode = this.visited.get(curNode++);
-            this.visitSquare(nextNode[0], nextNode[1]);
-            Runner.refresh();
+    //Paints the next visited node (if appropriate) or path node (if all visited nodes are already painted)
+    public void paintNextNode() {
+        if(pathComplete) {
+            if(curVisitedNode <= visited.size()-1) {
+                //Paint next visited node
+                int[] nextNode = this.visited.get(curVisitedNode++);
+                this.visitSquare(nextNode[0], nextNode[1]);
+                Runner.refresh();
+            }
+            else if(curPathNode <= path.size()-1) {
+                //Paint next path node
+                int[] nextNode = this.path.get(curPathNode++);
+                this.markPath(nextNode[0], nextNode[1]);
+                Runner.refresh();
+            }
+            else {
+                //Paint current source and goal nodes
+                this.gameBoard[this.goalY][this.goalX] = GOAL;
+                this.gameBoard[this.sourceY][this.sourceX] = SOURCE;
+                Runner.refresh();
+            }
         }
     }
 
@@ -227,9 +244,15 @@ public class Board extends JPanel implements ActionListener {
         this.gameBoard[y][x] = VISITED;
     }
 
+    //Given an x,y coordinate pair, mark that square as part of the final path
+    public void markPath(int x, int y) {
+        this.gameBoard[y][x] = PATH;
+    }
+
     //Record visited nodes, so that they can be displayed
-    public void recordVisitedNodes(ArrayList<int[]> visitedNodes) {
+    public void recordVisitedNodesAndPath(ArrayList<int[]> visitedNodes, ArrayList<int[]> path) {
         this.visited = visitedNodes;
+        this.path = path;
         this.pathComplete = true;
     }
 
@@ -237,8 +260,10 @@ public class Board extends JPanel implements ActionListener {
     public void resetBoard() {
         //Reset info about visited nodes
         this.visited = null;
+        this.path = null;
         this.pathComplete = false;
-        this.curNode = 0;
+        this.curVisitedNode = 0;
+        this.curPathNode = 0;
 
         /*Reset board data*/
         //Initialize the game board to all empty blocks
