@@ -73,6 +73,22 @@ public class Board extends JPanel implements ActionListener {
         this.addMouseMotionListener(new WallPaintListener());
     }
 
+    //Returns the source location as
+    public int[] getSource() {
+        int[] sourceLoc = new int[2];
+        sourceLoc[0] = this.sourceX;
+        sourceLoc[1] = this.sourceY;
+        return sourceLoc;
+    }
+
+    //Returns the source location as
+    public int[] getGoal() {
+        int[] goalLoc = new int[2];
+        goalLoc[0] = this.goalX;
+        goalLoc[1] = this.goalY;
+        return goalLoc;
+    }
+
     @Override
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
@@ -114,7 +130,7 @@ public class Board extends JPanel implements ActionListener {
                         break;
                 }
                 //Paint square
-                g.fillRect(j*10,i*10,10,10);
+                g.fillRect(j*DOT_SIZE,i*DOT_SIZE,DOT_SIZE,DOT_SIZE);
             }
         }
     }
@@ -125,38 +141,43 @@ public class Board extends JPanel implements ActionListener {
         this.repaint();
     }
 
+    //Given an x, y coordinate pair, check to see if it's valid
+    public boolean valid(int x, int y) {
+        return ( (x/DOT_SIZE>=0) && (x/DOT_SIZE<(B_WIDTH/DOT_SIZE)) && (y/DOT_SIZE>=0) && (y/DOT_SIZE<(B_HEIGHT/DOT_SIZE)) );
+    }
+
     //Given an x-coordinate and y-coordinate for a mouse event, set a wall there
     public void setWall(int x, int y) {
-        if(x/10>=0 && x/10<(B_WIDTH/DOT_SIZE) && y/10>=0 && y/10<(B_HEIGHT/DOT_SIZE)) {
-            this.gameBoard[y/10][x/10] = WALL;
+        if(this.valid(x, y)) {
+            this.gameBoard[y/DOT_SIZE][x/DOT_SIZE] = WALL;
         }
     }
 
     //Given an x-coordinate and y-coordinate for a mouse event, make that square empty
     public void removeWall(int x, int y) {
-        if(x/10>=0 && x/10<(B_WIDTH/DOT_SIZE) && y/10>=0 && y/10<(B_HEIGHT/DOT_SIZE)) {
-            if(this.gameBoard[y/10][x/10] == WALL) {
-                this.gameBoard[y/10][x/10] = EMPTY;
+        if(this.valid(x, y)) {
+            if(this.gameBoard[y/DOT_SIZE][x/DOT_SIZE] == WALL) {
+                this.gameBoard[y/DOT_SIZE][x/DOT_SIZE] = EMPTY;
             }
         }
     }
 
     //Given an x,y coordinate pair, place the source there
     public void placeSource(int x, int y) {
-        if(x/10>=0 && x/10<(B_WIDTH/DOT_SIZE) && y/10>=0 && y/10<(B_HEIGHT/DOT_SIZE)) {
+        if(this.valid(x, y)) {
             this.gameBoard[this.sourceY][this.sourceX] = EMPTY;
-            this.sourceY = y/10;
-            this.sourceX = x/10;
+            this.sourceY = y/DOT_SIZE;
+            this.sourceX = x/DOT_SIZE;
             this.gameBoard[this.sourceY][this.sourceX] = SOURCE;
         }
     }
 
     //Given an x,y coordinate pair, place the goal there
     public void placeGoal(int x, int y) {
-        if(x/10>=0 && x/10<(B_WIDTH/DOT_SIZE) && y/10>=0 && y/10<(B_HEIGHT/DOT_SIZE)) {
+        if(this.valid(x, y)) {
             this.gameBoard[this.goalY][this.goalX] = EMPTY;
-            this.goalY = y/10;
-            this.goalX = x/10;
+            this.goalY = y/DOT_SIZE;
+            this.goalX = x/DOT_SIZE;
             this.gameBoard[this.goalY][this.goalX] = GOAL;
         }
     }
@@ -209,7 +230,7 @@ class MenuItemListener extends AbstractAction {
 
         //Process the event accordingly
         if(text.equals("Find Path")) {
-            //TODO: Actual graph work
+            Runner.findPath();
         }
         //User wants to enter wall paint mode
         else if(text.equals("Paint Walls")) {

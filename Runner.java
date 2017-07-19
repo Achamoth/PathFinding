@@ -78,4 +78,9 @@ public class Runner {
     public static void setGoalPlaceMode() {
         userMode = Board.GOAL_PLACE_MODE;
     }
+
+    //Use pathfinding algorithm to find path from source to goal, and paint display in real-time to visualize algorithm
+    public static void findPath() {
+        Graph.AStar(board);
+    }
 }
