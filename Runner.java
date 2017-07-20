@@ -92,8 +92,8 @@ public class Runner {
         board.paintNextNode();
     }
 
-    //Reset board (to perform pathfinding again)
-    public static void resetBoard() {
-        board.resetBoard();
+    //Reset board (to perform pathfinding again). Boolean argument indicates whether or not walls should be cleared
+    public static void resetBoard(boolean resetWalls) {
+        board.resetBoard(resetWalls);
     }
 }

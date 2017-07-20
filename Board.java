@@ -257,7 +257,7 @@ public class Board extends JPanel implements ActionListener {
     }
 
     //Resets board (so that pathfinding can be done again)
-    public void resetBoard() {
+    public void resetBoard(boolean resetWalls) {
         //Reset info about visited nodes
         this.visited = null;
         this.path = null;
@@ -266,18 +266,15 @@ public class Board extends JPanel implements ActionListener {
         this.curPathNode = 0;
 
         /*Reset board data*/
-        //Initialize the game board to all empty blocks
+        //Initialize the game board to all empty blocks, leaving walls as they are
         for(int i=0; i<this.gameBoard.length; i++) {
             for(int j=0; j<this.gameBoard[i].length; j++) {
-                this.gameBoard[i][j] = EMPTY;
+                if(this.gameBoard[i][j] != WALL || resetWalls)
+                    this.gameBoard[i][j] = EMPTY;
             }
         }
 
         //Place source and goal
-        this.sourceX = 4;
-        this.sourceY = 3;
-        this.goalX = (B_WIDTH/DOT_SIZE)-3;
-        this.goalY = (B_HEIGHT/DOT_SIZE)-4;
         gameBoard[this.sourceY][this.sourceX] = SOURCE;
         gameBoard[this.goalY][this.goalX] = GOAL;
     }
@@ -291,7 +288,9 @@ class RightClickMenu extends JPopupMenu {
     private JMenuItem startWallErasing;
     private JMenuItem moveSource;
     private JMenuItem moveGoal;
-    private JMenuItem resetBoard;
+
+    private JMenu resetBoard;
+    private JMenu algorithmSelection;
 
     //Create and add all menu items
     public RightClickMenu() {
@@ -321,10 +320,25 @@ class RightClickMenu extends JPopupMenu {
         this.moveGoal.addActionListener(new MenuItemListener());
         this.add(moveGoal);
 
-        //Sixth menu item allows user to reset the board
-        this.resetBoard = new JMenuItem("Reset");
-        this.resetBoard.addActionListener(new MenuItemListener());
+        //Sixth menu item allows user to reset the board (either just the pathfinding, or also the walls)
+        this.resetBoard = new JMenu("Reset");
+        JMenuItem leaveWalls = new JMenuItem("Leave Walls");
+        leaveWalls.addActionListener(new MenuItemListener());
+        this.resetBoard.add(leaveWalls);
+        JMenuItem resetWalls = new JMenuItem("Reset Walls");
+        resetWalls.addActionListener(new MenuItemListener());
+        this.resetBoard.add(resetWalls);
         this.add(resetBoard);
+
+        //7th item is a sub-menu for choosing the pathfinding algorithm
+        this.algorithmSelection = new JMenu("Pathfinding Algorithm");
+        JMenuItem aStar = new JMenuItem("A*");
+        aStar.addActionListener(new MenuItemListener());
+        this.algorithmSelection.add(aStar);
+        JMenuItem dijkstra = new JMenuItem("Dijkstra's");
+        dijkstra.addActionListener(new MenuItemListener());
+        this.algorithmSelection.add(dijkstra);
+        this.add(algorithmSelection);
     }
 }
 
@@ -354,8 +368,21 @@ class MenuItemListener extends AbstractAction {
         else if(text.equals("Move Goal")) {
             Runner.setGoalPlaceMode();
         }
-        else if(text.equals("Reset")) {
-            Runner.resetBoard();
+        //User wants to reset board, but leaving walls intact
+        else if(text.equals("Leave Walls")) {
+            Runner.resetBoard(false);
+        }
+        //User wants to reset board, including the walls
+        else if(text.equals("Reset Walls")) {
+            Runner.resetBoard(true);
+        }
+        //User wants to use A* algorithm
+        else if(text.equals("A*")) {
+            Graph.ALGORITHM = Graph.A_STAR;
+        }
+        //User wants to use Dijkstra's algorithm
+        else if(text.equals("Dijkstra's")) {
+            Graph.ALGORITHM = Graph.DIJKSTRA;
         }
     }
 }

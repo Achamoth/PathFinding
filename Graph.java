@@ -9,6 +9,11 @@ import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 
 public class Graph {
+    //Public enum that records what pathfinding algorithm to use
+    public static final int A_STAR = 0;
+    public static final int DIJKSTRA = 1;
+    public static int ALGORITHM = A_STAR;
+
     //Find a path from source to goal using A*, and also record visited nodes (in order) in visitedNodes
     public static ArrayList<int[]> AStar(Board board, ArrayList<int[]> visitedNodes) {
         //Given a board object, finds the shortest path between the source and goal using AStar
@@ -67,7 +72,7 @@ public class Graph {
         for(int i=pathInverted.size()-1; i>=0; i--) {
             path.add(stringToCoordinates(pathInverted.get(i)));
         }
-        
+
         return path;
     }
 
@@ -149,11 +154,23 @@ class Node implements Comparable<Node> {
 
     @Override
     public int compareTo(Node n) {
-        if((this.heuristic + this.distance) < (n.getHeuristic() + n.getDistance())) {
+        //Calculate each node's function (for the pathfinding search i.e. the distance from source + the heuristic to goal)
+        double thisFunction = 0.0;
+        double nFunction = 0.0;
+        if(Graph.ALGORITHM == Graph.A_STAR) {
+            thisFunction = this.heuristic + this.distance;
+            nFunction = n.getHeuristic() + n.getDistance();
+        }
+        else {
+            thisFunction = this.distance;
+            nFunction = n.getDistance();
+        }
+
+        if(thisFunction < nFunction) {
             //This object is less than n
             return -1;
         }
-        else if((this.heuristic + this.distance) > (n.getHeuristic() + n.getDistance())) {
+        else if(thisFunction > nFunction) {
             //This object is greater than n
             return 1;
         }
