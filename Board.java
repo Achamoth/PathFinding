@@ -21,8 +21,8 @@ import java.util.ArrayList;
 public class Board extends JPanel implements ActionListener {
 
     //The dimensions of the simulation
-    private final int B_WIDTH = 1000;
-    private final int B_HEIGHT = 750;
+    private final int B_WIDTH = 700;
+    private final int B_HEIGHT = 700;
     private final int DOT_SIZE = 10;
     private final int ALL_DOTS = (B_WIDTH*B_HEIGHT)/(DOT_SIZE*DOT_SIZE);
 
@@ -82,7 +82,7 @@ public class Board extends JPanel implements ActionListener {
         this.addMouseMotionListener(new WallPaintListener());
 
         //Set timer (for updating display in real-time when painting nodes visited during search)
-        int delay = 7;
+        int delay = 3;
         ActionListener nodePainter = new ActionListener() {
             public void actionPerformed(ActionEvent evt) {
                 Runner.paintNextNode();
