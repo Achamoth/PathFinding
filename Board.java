@@ -92,6 +92,14 @@ public class Board extends JPanel implements ActionListener {
         new Timer(delay, nodePainter).start();
     }
 
+    public int getWidth() {
+        return this.B_WIDTH;
+    }
+
+    public int getHeight() {
+        return this.B_HEIGHT;
+    }
+
     //Paints the next visited node (if appropriate) or path node (if all visited nodes are already painted)
     public void paintNextNode() {
         if(pathComplete) {
