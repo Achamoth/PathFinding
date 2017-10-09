@@ -113,20 +113,33 @@ public class Graph {
         ArrayList<Node> neighbours = new ArrayList<Node>();
 
         //Tie-breaker constant
-        double tbreaker = 1 + (double)( (double)1 / ( (double)board.getWidth() * (double)board.getHeight() ) );
+        // double tbreaker = 1 + (double)( (double)1 / ( (double)board.getWidth() * (double)board.getHeight()) );
+        double tbreaker = 1;
 
         //Check that all adjacent positions are valid positions on the board, and not walls
         if(board.isEmptySquareOrGoal(node.getX()+1, node.getY())) {
-            neighbours.add(new Node(node.getX()+1, node.getY(), tbreaker*manhattanDist(node.getX()+1, node.getY(),goal), node.getDistance()+ 1));
+            neighbours.add(new Node(node.getX()+1, node.getY(), tbreaker*euclidianDist(node.getX()+1, node.getY(),goal), node.getDistance()+ 1));
         }
         if(board.isEmptySquareOrGoal(node.getX()-1, node.getY())) {
-            neighbours.add(new Node(node.getX()-1, node.getY(), tbreaker*manhattanDist(node.getX()-1, node.getY(),goal), node.getDistance()+ 1));
+            neighbours.add(new Node(node.getX()-1, node.getY(), tbreaker*euclidianDist(node.getX()-1, node.getY(),goal), node.getDistance()+ 1));
         }
         if(board.isEmptySquareOrGoal(node.getX(), node.getY()+1)) {
-            neighbours.add(new Node(node.getX(), node.getY()+1, tbreaker*manhattanDist(node.getX(), node.getY()+1,goal), node.getDistance()+ 1));
+            neighbours.add(new Node(node.getX(), node.getY()+1, tbreaker*euclidianDist(node.getX(), node.getY()+1,goal), node.getDistance()+ 1));
         }
         if(board.isEmptySquareOrGoal(node.getX(), node.getY()-1)) {
-            neighbours.add(new Node(node.getX(), node.getY()-1, tbreaker*manhattanDist(node.getX(), node.getY()-1,goal), node.getDistance()+ 1));
+            neighbours.add(new Node(node.getX(), node.getY()-1, tbreaker*euclidianDist(node.getX(), node.getY()-1,goal), node.getDistance()+ 1));
+        }
+        if(board.isEmptySquareOrGoal(node.getX()+1, node.getY()-1) && board.isEmptySquareOrGoal(node.getX()+1, node.getY()) && board.isEmptySquareOrGoal(node.getX(), node.getY()-1)) {
+            neighbours.add(new Node(node.getX()+1, node.getY()-1, tbreaker*euclidianDist(node.getX()+1, node.getY()-1,goal), node.getDistance()+ 1));
+        }
+        if(board.isEmptySquareOrGoal(node.getX()-1, node.getY()-1) && board.isEmptySquareOrGoal(node.getX()-1, node.getY()) && board.isEmptySquareOrGoal(node.getX(), node.getY()-1)) {
+            neighbours.add(new Node(node.getX()-1, node.getY()-1, tbreaker*euclidianDist(node.getX()-1, node.getY()-1,goal), node.getDistance()+ 1));
+        }
+        if(board.isEmptySquareOrGoal(node.getX()+1, node.getY()+1) && board.isEmptySquareOrGoal(node.getX()+1, node.getY()) && board.isEmptySquareOrGoal(node.getX(), node.getY()+1)) {
+            neighbours.add(new Node(node.getX()+1, node.getY()+1, tbreaker*euclidianDist(node.getX()+1, node.getY()+1,goal), node.getDistance()+ 1));
+        }
+        if(board.isEmptySquareOrGoal(node.getX()-1, node.getY()+1) && board.isEmptySquareOrGoal(node.getX()-1, node.getY()) && board.isEmptySquareOrGoal(node.getX(), node.getY()+1)) {
+            neighbours.add(new Node(node.getX()-1, node.getY()+1, tbreaker*euclidianDist(node.getX()-1, node.getY()+1,goal), node.getDistance()+ 1));
         }
 
         return neighbours;
